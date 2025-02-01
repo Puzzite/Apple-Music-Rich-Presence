@@ -10,6 +10,7 @@ let state = "Not Opened";
 let currentSong = {};
 let startDate = new Date();
 let lastSong = "";
+let imageUrl = "";
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -28,24 +29,6 @@ function setTime(sec) {
   return t.getTime()
 }
 
-const puppeteer = require('puppeteer');
-
-async function getAlbumArt(albumArt) {
-  const searchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent( albumArt + " album cover")}`;
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-
-  await page.goto(searchUrl, { waitUntil: 'networkidle2' });
-
-  const imageUrl = await page.evaluate(() => {
-    const imgElement = document.querySelector('img');
-    return imgElement ? imgElement.src : null;
-  });
-
-  await browser.close();
-  return imageUrl;
-}
-
 app.whenReady().then(createWindow);
 
 async function update() {
@@ -60,26 +43,37 @@ async function update() {
     currentSong.name = songname;
   }
 
-  let fullTitle = currentSong ? `${currentSong.name} - ${currentSong.artist || "Unknown Artist"}` : "No Song";
+  let fullTitle = currentSong ? `${currentSong.artist || "Unknown Artist"} - ${currentSong.name}` : "No Song";
 
   if (state == "Playing" && (fullTitle !== lastSong || !lastSong)) {
     startDate = new Date();
-    lastSong = `${currentSong.artist || "Unknown Artist"} - ${currentSong.name}`;
+    lastSong = `${currentSong.name} by ${currentSong.artist || "Unknown Artist"}`;
     startDate.setSeconds(new Date().getSeconds() - parseInt(currentSong.elapsed) - 1);
   }
 
+  const apiKey = "";  // Replace with your API Key
+  const searchEngineId = "";  // Replace with your CSE ID
+
+  async function fetchImages(query) {
+    query = query + " album cover";
+    const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${searchEngineId}&q=${query}&searchType=image`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const imageUrls = data.items.map(item => item.link);
+    const [firstKey, firstValue] = imageUrls.entries().next().value;
+    return imageUrls[0];
+  }
+
+
   startDate = new Date();
   startDate.setSeconds(new Date().getSeconds() - parseInt(currentSong.elapsed));
-
-  // Get the album cover image
-  let albumArt = await getAlbumArt(currentSong.album || "Unknown Album");
-  if (!albumArt) albumArt = "applemusic"; // Fallback image
 
   client.updatePresence({
     state: (state == "Playing") ? `on ${currentSong.album || "Unknown"}` : state,
     details: `${currentSong.name || "Unknown"} - ${currentSong.artist || "Unknown"}`,
     startTimestamp: (state == "Playing") ? startDate.getTime() : Date.now(),
-    largeImageKey: albumArt,
+    largeImageKey: await fetchImages(currentSong.album),
     smallImageKey: (state == "Playing") ? "pause" : "play",
     smallImageText: state,
     largeImageText: (state == "Playing") ? `${fullTitle}` : "Idling",
