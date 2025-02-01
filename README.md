@@ -20,7 +20,7 @@ This Discord Rich Presence is a bridge between the known social media [Discord](
   * song album
   * Song artist 
 
- <img width="554" alt="status" src="https://github.com/user-attachments/assets/34d2d375-00c9-4911-aa2b-d3df2c73de16" />
+<img width="550" alt="status" src="https://github.com/user-attachments/assets/e9dc286c-df78-4d24-b0f9-9023450f0f40" />
 
 
 ### **2. Song Paused Screen**
