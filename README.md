@@ -20,13 +20,13 @@ This Discord Rich Presence is a bridge between the known social media [Discord](
   * song album
   * Song artist 
 
-  ![Image of the status showing song name, album and artist](./images/status.jpg)
+  ![Image of the status showing song name, album and artist](./images/status)
 
 ### **2. Song Paused Screen**
   * Displays that the song is paused and a "paused" image appears.
   * Hides Album name (unfortunately)
 
-  ![Image of the song paused.](./images/paused.jpg)
+  ![Image of the song paused.](./images/paused)
 
 ### **3. "Search [song] Button** 
 
